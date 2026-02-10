@@ -1,0 +1,76 @@
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+public class PartitionsTest {
+
+    // Arrays from your assignment screenshot
+    private final int[] sorted = {10, 17, 19, 21, 44, 55, 57, 63, 65, 67};
+    private final int[] unsorted = {84, 3, 7, 1, 9, 6, 2, 5};
+    private final int[] empty = {};
+
+    // ---------- helpers to validate partition property ----------
+    private void assertLomutoProperty(int[] a, int lo, int hi, int p) {
+        int pivot = a[p];
+        for (int i = lo; i < p; i++) assertTrue(a[i] <= pivot, "Left side must be <= pivot");
+        for (int i = p + 1; i <= hi; i++) assertTrue(a[i] > pivot, "Right side must be > pivot");
+    }
+
+    private void assertHoareProperty(int[] a, int lo, int hi, int p) {
+        // Hoare returns p where a[lo..p] <= a[p+1..hi]
+        int maxLeft = Integer.MIN_VALUE;
+        for (int i = lo; i <= p; i++) maxLeft = Math.max(maxLeft, a[i]);
+
+        int minRight = Integer.MAX_VALUE;
+        for (int i = p + 1; i <= hi; i++) minRight = Math.min(minRight, a[i]);
+
+        assertTrue(maxLeft <= minRight, "All left elements should be <= all right elements");
+    }
+
+    // ---------- Lomuto tests ----------
+    @Test
+    void lomuto_sortedArray() {
+        int[] a = sorted.clone();
+        int p = Partitions.lomutoPartition(a, 0, a.length - 1);
+        assertTrue(p >= 0 && p < a.length);
+        assertLomutoProperty(a, 0, a.length - 1, p);
+    }
+
+    @Test
+    void lomuto_unsortedArray() {
+        int[] a = unsorted.clone();
+        int p = Partitions.lomutoPartition(a, 0, a.length - 1);
+        assertTrue(p >= 0 && p < a.length);
+        assertLomutoProperty(a, 0, a.length - 1, p);
+    }
+
+    @Test
+    void lomuto_emptyArray() {
+        int[] a = empty.clone();
+        int p = Partitions.lomutoPartition(a, 0, 0); // returns -1 by our design
+        assertEquals(-1, p);
+    }
+
+    // ---------- Hoare tests ----------
+    @Test
+    void hoare_sortedArray() {
+        int[] a = sorted.clone();
+        int p = Partitions.hoarePartition(a, 0, a.length - 1);
+        assertTrue(p >= 0 && p < a.length);
+        assertHoareProperty(a, 0, a.length - 1, p);
+    }
+
+    @Test
+    void hoare_unsortedArray() {
+        int[] a = unsorted.clone();
+        int p = Partitions.hoarePartition(a, 0, a.length - 1);
+        assertTrue(p >= 0 && p < a.length);
+        assertHoareProperty(a, 0, a.length - 1, p);
+    }
+
+    @Test
+    void hoare_emptyArray() {
+        int[] a = empty.clone();
+        int p = Partitions.hoarePartition(a, 0, 0); // returns -1 by our design
+        assertEquals(-1, p);
+    }
+}
